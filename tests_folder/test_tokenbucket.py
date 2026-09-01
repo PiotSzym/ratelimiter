@@ -41,9 +41,9 @@ def test_tokens_refill_over_time(testbucket, monkeypatch):
     monkeypatch.setattr(time, "time", lambda: real_time() + 1)
     assert testbucket.tokencheck("testID") is True
 
-def test_different_keys_independent(testbucket):
+def test_different_user_buckets_independent(testbucket):
     for i in range(3):
         testbucket.tokencheck("testID")
-        
+
     assert testbucket.tokencheck("testID") is False
     assert testbucket.tokencheck("testID2") is True
