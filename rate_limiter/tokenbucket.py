@@ -6,12 +6,14 @@ class TokenBucketRateLimiter():
     """
 
     def __init__(self, tokens_max: int, refill_rate: float) -> None:
+        """
+        time to refill is 1/refill_rate
+        The underscore is used to encapsulate buckets for each user
+        """
         self.tokens_max = tokens_max
         self.refill_rate = refill_rate
         self._buckets = {}
-        """
-        The underscore is used to encapsulate buckets for each user
-        """
+        
 
     def tokencheck(self, id:str) -> bool:
         """
@@ -28,11 +30,10 @@ class TokenBucketRateLimiter():
                 "tokens": self.tokens_max,
                 "latest_refill": timenow
             }
-            time_since_last_refill = 0
-        else:
-            time_since_last_refill = timenow - bucket["latest_refill"]
 
         bucket = self._buckets[id]
+
+        time_since_last_refill = timenow - bucket["latest_refill"]
 
         tokens_now = min(self.tokens_max, bucket["tokens"] + time_since_last_refill*self.refill_rate)
 
