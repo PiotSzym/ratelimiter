@@ -1,4 +1,4 @@
-from tokenbucket import TokenBucketRateLimiter
+from rate_limiter.tokenbucket import TokenBucketRateLimiter
 from random import randint
 
 class RateLimiter():
