@@ -46,3 +46,9 @@ class TokenBucketRateLimiter():
 
         bucket["tokens"] -= 1
         return True
+
+    def setmax(self, new_max: int):
+        self.tokens_max = new_max
+
+    def setrefill(self, new_refill:int):
+        self.refill_rate = new_refill
