@@ -3,8 +3,11 @@ from random import randint
 
 class RateLimiter():
 
-    def __init__(self):
-        self.id = "ID"+str(randint(1,1000000000))
+    def __init__(self, id: int):
+        if id:
+            self.id = "ID"+str(id)
+        else:
+            self.id = "ID"+str(randint(1,1000000000))
         self.bucket = TokenBucketRateLimiter(5,1)
 
     def allow(self, id: str, bucket: TokenBucketRateLimiter) -> bool:
