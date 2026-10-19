@@ -13,40 +13,40 @@ class TokenBucketRateLimiter():
         self._buckets = {}
         
 
-    def tokencheck(self, id:str) -> bool:
-        '''
-        Init bucket for user if there isnt one already
-        Refill the bucket if enough time has passed
-        Check if the bucket has enough tokens
-        Return bool whether token was used or not enough tokens available
-        '''
-
+    def bucket(self, id: str) -> dict:
         timenow = time.time()
 
         if id not in self._buckets:
+
             self._buckets[id] = {
                 "tokens": self.tokens_max,
+                "max": self.tokens_max,
+                "refill": self.refill_rate,
                 "latest_refill": timenow
             }
-
-        bucket = self._buckets[id]
-
-        time_since_last_refill = timenow - bucket["latest_refill"]
-
-        tokens_now = min(self.tokens_max, bucket["tokens"] + time_since_last_refill*self.refill_rate)
-
-        bucket["tokens"] = tokens_now
-
+        return self._buckets[id]
+    
+    def refill(self, bucket: dict) -> None:
+        timenow = time.time()
+        elapsed = timenow - bucket["latest_refill"]
+        bucket["tokens"] = min(bucket["max"], bucket["tokens"] + elapsed * bucket["refill"])
         bucket["latest_refill"] = timenow
+    
+    def changemax(self, id: str, delta_max: int) -> None:
+        bucket = self.bucket(id)
+        self.refill(bucket)
+        bucket["max"] = max(1, bucket["max"] + delta_max)
+        bucket["tokens"] = min(bucket["tokens"], bucket["max"])
 
+    def changerefill(self, id: str, delta_refill: float) -> None:
+        bucket = self.bucket(id)
+        self.refill(bucket)
+        bucket["refill"] = max(0.1, bucket["refill"] + delta_refill)
+
+    def tokencheck(self, id: str) -> bool:
+        bucket = self.bucket(id)
+        self.refill(bucket)
         if bucket["tokens"] < 1:
             return False
-
         bucket["tokens"] -= 1
         return True
-
-    def changemax(self, delta_max: int):
-        self.tokens_max += delta_max
-
-    def changerefill(self, delta_refill:int):
-        self.refill_rate += delta_refill
