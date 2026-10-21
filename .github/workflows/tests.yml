@@ -14,4 +14,4 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - run: pytest --cov=rate_limiter --cov-report=term-missing
+      - run: pytest --cov=ratelimiter --cov-report=term-missing
